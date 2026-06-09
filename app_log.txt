@@ -1,3 +1,5 @@
 Add instructions for how to play each game
 Create a new game to add more complexity
 Improve on the visuals to make it more advanced
+
+06/09/26: Added instructions page for memory card game as noted by feedback
