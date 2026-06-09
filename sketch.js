@@ -1,18 +1,16 @@
 let mode = "menu";
 
-// Variables for reaction time game
-let rtState = "nothing"; // initial state of reaction time game
-let rtStartTime = 0; // set start time for reaction time to be 0
+let rtState = "nothing";
+let rtStartTime = 0;
 let reactionTime = 0;
 let waitDuration = 0;
 let waitStart = 0;
 
-let cards = []; // empty list to initialize card list
-let firstCard = null; // set first card to not be flipped
-let secondCard = null; // set second card to not be flipped
+let cards = [];
+let firstCard = null;
+let secondCard = null;
 let noFlip = false;
 
-// initialize variables for memory card game
 let colorList = [];
 let columns = 4;
 let rows = 4;
@@ -44,7 +42,6 @@ function setup() {
 }
 
 function draw() {
-  // separate different games of the code
   if (mode == "menu") {
     drawMenu();
   }
@@ -55,7 +52,6 @@ function draw() {
     drawMemory();
   }
 
-  // check if cards have been flipped for enough time
   if (currentTime > 0 && millis() > currentTime) {
     reflipCards();
   }
@@ -80,7 +76,6 @@ function drawMenu() {
   text("Memory Game", 400, 370);
 }
 
-// Function to draw back button
 function drawBackButton() {
   fill(255); 
   rect(20, 20, 100, 40);
@@ -90,11 +85,10 @@ function drawBackButton() {
   text("Back", 70, 40);
 }
 
-// Function to return boolean if mouse is on back button
 function mouseOnBack() {
   return mouseX > 20 && mouseX < 120 && mouseY > 20 && mouseY < 60;
 }
-// If mode is either of the games, bring back to menu
+
 function mousePressed() {
   if (mouseOnBack() && mode != "menu") {
     mode = "menu";
@@ -117,7 +111,6 @@ function mousePressed() {
   }
 }
 
-// Function for screen of reaction time game
 function drawReaction() {
   textAlign(CENTER, CENTER); 
   textSize(28);
@@ -179,7 +172,10 @@ function reactionClick() {
 function drawMemory() {
   if (gameState == "start") {
     memoryStartScreen();
-  } 
+  }
+  else if (gameState == "instructions") {
+    memoryInstructionsScreen();
+  }
   else if (gameState == "game") {
     memoryGameScreen();
   }
@@ -197,25 +193,65 @@ function memoryStartScreen() {
   textAlign(CENTER, CENTER); 
   fill(0); 
   textSize(60);
-  text("Memory Match", width/2, 100);
+  text("Memory Match", width/2, 90);
   textSize(28);
-  text("Click a difficulty to start", width/2, 180);
+  text("Click a difficulty to start", width/2, 160);
 
+  fill(150,200,255);
+  rect(250,195,300,55);
   fill(120,200,120); 
-  rect(250,230,300,60);
+  rect(250,265,300,55);
   fill(120,120,220); 
-  rect(250,310,300,60);
+  rect(250,335,300,55);
   fill(220,120,120); 
-  rect(250,390,300,60);
+  rect(250,405,300,55);
 
   fill(0); 
-  textSize(28);
-  text("Easy",   400, 260);
-  text("Medium", 400, 340);
-  text("Hard",   400, 420);
+  textSize(26);
+  text("How to Play", 400, 222);
+  text("Easy",        400, 292);
+  text("Medium",      400, 362);
+  text("Hard",        400, 432);
 }
 
-// First part of function completed with the assistance of AI
+function memoryInstructionsScreen() {
+  background(204,229,255);
+  textAlign(CENTER, CENTER);
+  fill(0);
+  textSize(48);
+  text("How to Play", width/2, 60);
+
+  textSize(18);
+  textAlign(LEFT, TOP);
+
+  let steps = [
+    ["1  Flip two cards",  "Click any face-down card to reveal its colour."],
+    ["2  Find the match",  "Same colour? They stay face-up — you matched them!"],
+    ["3  Beat the clock",  "Match every pair before the timer hits zero to win."],
+    ["Tip",                "Miss a pair and your streak resets. Go for a clean run!"]
+  ];
+
+  let stepY = 115;
+  for (let i = 0; i < steps.length; i++) {
+    fill(0);
+    textStyle(BOLD);
+    text(steps[i][0], 80, stepY);
+    textStyle(NORMAL);
+    fill(50);
+    text(steps[i][1], 100, stepY + 26);
+    stepY += 80;
+  }
+
+  fill(100,200,255);
+  rect(250,470,300,55);
+  fill(0);
+  textStyle(BOLD);
+  textAlign(CENTER, CENTER);
+  textSize(22);
+  text("Back to menu", 400, 497);
+  textStyle(NORMAL);
+}
+
 function memoryGameScreen() {
   background(0);
   fill(255); 
@@ -266,21 +302,26 @@ function memoryLoseScreen() {
 
 function memoryMousePressed() {
   if (mouseOnBack()) {
-      return;
+    return;
   }
   
   if (gameState == "start") {
-    if (mouseX > 250 && mouseX < 550 && mouseY > 230 && mouseY < 290) { 
-      setDifficulty("easy");   
-      startMemoryGame(); 
+    if (mouseX > 250 && mouseX < 550 && mouseY > 195 && mouseY < 250) {
+      gameState = "instructions";
     }
-    if (mouseX > 250 && mouseX < 550 && mouseY > 310 && mouseY < 370) { 
-      setDifficulty("medium"); 
-      startMemoryGame(); 
+    if (mouseX > 250 && mouseX < 550 && mouseY > 265 && mouseY < 320) { 
+      setDifficulty("easy");   startMemoryGame(); 
     }
-    if (mouseX > 250 && mouseX < 550 && mouseY > 390 && mouseY < 450) { 
-      setDifficulty("hard");   
-      startMemoryGame(); 
+    if (mouseX > 250 && mouseX < 550 && mouseY > 335 && mouseY < 390) { 
+      setDifficulty("medium"); startMemoryGame(); 
+    }
+    if (mouseX > 250 && mouseX < 550 && mouseY > 405 && mouseY < 460) { 
+      setDifficulty("hard");   startMemoryGame(); 
+    }
+  }
+  else if (gameState == "instructions") {
+    if (mouseX > 250 && mouseX < 550 && mouseY > 460 && mouseY < 515) {
+      gameState = "start";
     }
   }
   else if (gameState == "win" || gameState == "lose") {
@@ -297,7 +338,6 @@ function memoryMousePressed() {
   }
 }
 
-// Set number of cards, timer, and time for card to flip depending on user input of difficulty
 function setDifficulty(level) {
   if (level == "easy")   { 
     columns = 3; 
@@ -319,7 +359,6 @@ function setDifficulty(level) {
   }
 }
 
-// Reset variables for when memory game begins
 function startMemoryGame() {
   assignCards();
   gameStartTime = millis();
@@ -331,7 +370,6 @@ function startMemoryGame() {
   currentTime = 0;
 }
 
-// Create initial cards in memory card game
 function assignCards() {
   let cardColors = [];
   let pairs = (columns * rows) / 2;
@@ -381,6 +419,7 @@ function flipCard(index, cardsArray) {
         firstCard = null;
         secondCard = null;
         noFlip = false;
+        
 
         let allMatched = true;
         
