@@ -24,6 +24,12 @@ let gameState = "start";
 let streak = 0;
 let seconds;
 
+let aimScore = 0;
+let aimStartTime = 0;
+let aimCircleX = 0;
+let aimCircleY = 0;
+let aimRadius = 40;
+let aimState = "start";
 
 function setup() {
   createCanvas(800, 600);
@@ -51,6 +57,9 @@ function draw() {
   else if (mode == "memory") {
     drawMemory();
   }
+  else if (mode == "aim") {
+  drawAim();
+}
 
   if (currentTime > 0 && millis() > currentTime) {
     reflipCards();
@@ -74,6 +83,12 @@ function drawMenu() {
   rect(250,340,300,60);
   fill(0); 
   text("Memory Game", 400, 370);
+  
+  fill(255,100,100);
+  rect(250,420,300,60);
+  fill(255);
+  text("Aim Trainer", 400, 450);
+  
 }
 
 function drawBackButton() {
@@ -99,15 +114,28 @@ function mousePressed() {
 
   if (mode == "menu") {
     if (mouseX > 250 && mouseX < 550 && mouseY > 260 && mouseY < 320) {
-      mode = "reaction"; rtState = "nothing";
+      mode = "reaction";
+      rtState = "nothing";
     }
+
     if (mouseX > 250 && mouseX < 550 && mouseY > 340 && mouseY < 400) {
-      mode = "memory"; gameState = "start";
+      mode = "memory";
+      gameState = "start";
     }
+
+    if (mouseX > 250 && mouseX < 550 && mouseY > 420 && mouseY < 480) {
+      mode = "aim";
+      aimState = "start";
+    }
+
   } else if (mode == "reaction") {
     reactionClick();
+
   } else if (mode == "memory") {
     memoryMousePressed();
+
+  } else if (mode == "aim") {
+    aimMousePressed();
   }
 }
 
@@ -448,4 +476,70 @@ function reflipCards() {
   secondCard = null;
   noFlip = false;
   currentTime = 0;
+}
+
+function drawAim() {
+  background(0);
+
+  if (aimState == "start") {
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(32);
+    text("Click to Start", width / 2, height / 2);
+  }
+  else if (aimState == "game") {
+    let timeLeft = 30 - floor((millis() - aimStartTime) / 1000);
+
+    if (timeLeft <= 0) {
+      aimState = "result";
+      timeLeft = 0;
+    }
+
+    fill(255);
+    textAlign(RIGHT, TOP);
+    textSize(24);
+    text("Timer:" + " " + timeLeft, width - 40, 40);
+
+    fill(255, 0, 0);
+    circle(aimCircleX, aimCircleY, aimRadius * 2);
+  }
+  else if (aimState == "result") {
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(32);
+    text("Score: " + aimScore, width / 2, height / 2);
+    textSize(20);
+    text("Click to play again", width / 2, height / 2 + 50);
+  }
+
+  drawBackButton();
+}
+
+function aimMousePressed() {
+  if (mouseOnBack()) {
+    return;
+  }
+
+  if (aimState == "start") {
+    aimScore = 0;
+    aimStartTime = millis();
+    aimState = "game";
+    spawnAimCircle();
+  }
+  else if (aimState == "game") {
+    let d = dist(mouseX, mouseY, aimCircleX, aimCircleY);
+
+    if (d <= aimRadius) {
+      aimScore++;
+      spawnAimCircle();
+    }
+  }
+  else if (aimState == "result") {
+    aimState = "start";
+  }
+}
+
+function spawnAimCircle() {
+  aimCircleX = random(aimRadius, width - aimRadius);
+  aimCircleY = random(aimRadius, height - aimRadius);
 }
